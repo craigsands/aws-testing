@@ -1,5 +1,9 @@
 provider "aws" {}
 
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
 resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
 }
@@ -17,7 +21,7 @@ resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4" {
 }
 
 resource "aws_rds_cluster" "default" {
-  availability_zones      = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  availability_zones      = slice(data.aws_availability_zones.available.names, 0, 3)
   database_name           = "mydb"
   db_cluster_instance_class = "db.r6g.large"
   engine                  = "aurora-mysql"
